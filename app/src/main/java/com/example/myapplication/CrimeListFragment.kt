@@ -178,7 +178,8 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private inner class CrimeDiffUtil: DiffUtil.ItemCallback<Crime>(){
+    private inner class CrimeDiffUtil:
+        DiffUtil.ItemCallback<Crime>(){
         override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
             return oldItem == newItem;
         }
