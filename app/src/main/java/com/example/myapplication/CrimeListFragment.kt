@@ -1,10 +1,9 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -13,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
 private const val TAG = "CrimeListFragment"
 
@@ -27,8 +27,45 @@ class CrimeListFragment : Fragment() {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java)
     }
 
+    /**
+     * Required interface for hosting activities
+     */
+    private var callbacks: Callbacks? = null;
+
+    interface Callbacks{
+        fun onCrimeSelected(crimeId:UUID);
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks=null
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.new_crime -> {
+                val crime = Crime()
+                crimeListViewModel.addCrime(crime)
+                callbacks?.onCrimeSelected(crime.id)
+                true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         //   Log.d(TAG, "Total crimes: ${crimeListViewModel.crimes.size}")
     }
 
@@ -97,8 +134,18 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onClick(v: View) {
-            Toast.makeText(context, "${crime.title} clicked!", Toast.LENGTH_SHORT)
-                .show()
+    //   Toast.makeText(context, "${crime.title} clicked!", Toast.LENGTH_SHORT)
+    //           .show()
+
+            /*val fragment=CrimeFragment();
+            val fm=activity?.supportFragmentManager
+            fm?.beginTransaction()?.replace(R.id.fragment_container,fragment)?.commit()
+*/
+            callbacks?.onCrimeSelected(crime.id)
+           /* val args = Bundle().apply {
+                putSerializable("name", "Maimoona")
+                putInt("age", 15)
+*/
         }
     }
 
