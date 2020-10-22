@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -10,9 +11,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
+import androidx.recyclerview.widget.ListAdapter;
 
 private const val TAG = "CrimeListFragment"
 
@@ -149,8 +152,11 @@ class CrimeListFragment : Fragment() {
         }
     }
 
+    /*private inner class CrimeAdapter(var crimes: List<Crime>) :
+        RecyclerView.Adapter<CrimeHolder>() {*/
+
     private inner class CrimeAdapter(var crimes: List<Crime>) :
-        RecyclerView.Adapter<CrimeHolder>() {
+        ListAdapter<Crime, CrimeHolder>(CrimeDiffUtil()) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
                 : CrimeHolder {
@@ -170,5 +176,17 @@ class CrimeListFragment : Fragment() {
         fun newInstance(): CrimeListFragment {
             return CrimeListFragment()
         }
+    }
+
+    private inner class CrimeDiffUtil: DiffUtil.ItemCallback<Crime>(){
+        override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem == newItem;
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem == newItem;
+        }
+
     }
 }
