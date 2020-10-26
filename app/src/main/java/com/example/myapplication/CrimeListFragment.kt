@@ -5,9 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -22,6 +20,10 @@ private const val TAG = "CrimeListFragment"
 class CrimeListFragment : Fragment() {
 
     private lateinit var crimeRecyclerView: RecyclerView
+    private lateinit var noDataTextView: TextView
+    private lateinit var addCrimeButton: Button
+    private lateinit var lyEmptyRecyclerView:LinearLayout
+
 
     //private var adapter: CrimeAdapter? =null;
     private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
@@ -83,6 +85,11 @@ class CrimeListFragment : Fragment() {
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
         crimeRecyclerView.adapter = adapter;
 
+        noDataTextView = view.findViewById(R.id.empty_list_textview)
+        addCrimeButton = view.findViewById(R.id.addCrimeBtn)
+        lyEmptyRecyclerView = view.findViewById(R.id.ly_empty_recyclerView)
+        //noDataTextView.text = getString(R.string.no_data_message)
+
         // updateUI()
 
         return view
@@ -102,13 +109,33 @@ class CrimeListFragment : Fragment() {
                     updateUI(crimes);
                 }
             })
+
+        addCrimeButton.setOnClickListener {
+            val crime = Crime()
+            crimeListViewModel.addCrime(crime)
+            callbacks?.onCrimeSelected(crime.id)
+
+        }
     }
 
     private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes);
-        crimeRecyclerView.adapter = adapter;
+        //adapter = CrimeAdapter(crimes);
+      //  crimeRecyclerView.adapter = adapter;
         /* val crimes = crimeListViewModel.crimes
          adapter = CrimeAdapter(crimes)*/
+
+        if (crimes.isNotEmpty()) {
+            adapter = CrimeAdapter(crimes)
+            lyEmptyRecyclerView.visibility = View.GONE
+            crimeRecyclerView.adapter = adapter
+
+            /*val adapterTemp = crimeRecyclerView.adapter as CrimeAdapter
+            adapterTemp.submitList(crimes)*/
+        } else {
+            //the next line is belong to challenge 13 ch 14
+            crimeRecyclerView.visibility = View.GONE
+
+        }
     }
 
     private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view),
@@ -176,6 +203,7 @@ class CrimeListFragment : Fragment() {
             return CrimeListFragment()
         }
     }
+
 
     private inner class CrimeDiffUtil:
         DiffUtil.ItemCallback<Crime>(){
